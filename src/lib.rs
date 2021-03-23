@@ -1,5 +1,5 @@
 use std::convert::TryInto;
-
+use bitvec::prelude::*;
 const BIT_MASK: [u8; 8] = [1, 2, 4, 8, 16, 32, 64, 128];
 
 /// Sets bit at position `i` in `byte` according to LSB
@@ -76,6 +76,19 @@ pub fn scalar_eq_bitmap(lhs: &[i32], rhs: i32) -> Vec<u8> {
 
 pub fn scalar_eq_bool(lhs: &[i32], rhs: i32) -> Vec<bool> {
     lhs.iter().map(|x| *x == rhs).collect()
+}
+
+pub fn bv_scalar_eq_loop(lhs: &[i32], rhs: i32) -> BitVec<Lsb0, u8> {
+    let len = lhs.len();
+    let mut buf = BitVec::with_capacity(len);
+    for (mut bit, &val) in buf.iter_mut().zip(lhs.iter()) {
+        *bit = val == rhs;
+    }
+    buf
+}
+
+pub fn bv_scalar_eq_collect(lhs: &[i32], rhs: i32) -> BitVec<Lsb0, u8> {
+    lhs.iter().map(|&val| val == rhs).collect()
 }
 
 #[cfg(test)]
